@@ -1,0 +1,53 @@
+# SRDF-AF Configuration for PRO6000 48GB (AutoDL)
+# Aggressive settings for maximum throughput
+
+# === Paths ===
+r2r_dir: ./data/R2R
+connectivity_dir: ./data/connectivity
+skybox_dir: ./data/mp3d/v1/scans
+image_dir: ./data/images
+output_dir: ./output
+
+# === Data ===
+split: train
+max_images: 12         # full trajectory coverage
+fov: 90
+image_size: 480
+
+# === Models ===
+speaker: Qwen/Qwen2.5-VL-3B-Instruct
+judge_model: Qwen/Qwen3-VL-32B-Instruct  # local judge (48GB fits BF16)
+speaker_api: ""
+speaker_api_key: ""
+judge_api: ""                              # empty = local judge
+judge_api_key: ""
+lora_r: 64
+lora_alpha: 128
+qlora: true
+
+# === Generation ===
+n_candidates: 8
+temp_low: 0.7
+temp_high: 1.2
+max_gen_tokens: 512
+
+# === Judge ===
+judge_temperature: 0.0
+score_gap: 0.15
+
+# === Training ===
+sft_lr: 2.0e-4
+sft_epochs: 3
+dpo_lr: 5.0e-7
+dpo_beta: 0.1
+dpo_epochs: 1
+grpo_lr: 1.0e-6
+grpo_epochs: 1
+grpo_n_gen: 4
+batch_size: 4           # 48GB allows larger batch
+grad_accum: 4
+max_seq_len: 8192       # full context
+
+# === Flywheel ===
+n_rounds: 3
+optim: dpo

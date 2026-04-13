@@ -1,0 +1,29 @@
+[project]
+name = "srdf-af"
+version = "0.1.0"
+description = "Self-Refining Data Flywheel with AI Feedback for VLN Instruction Generation"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.4.0",
+    "transformers>=4.46.0",
+    "peft>=0.12.0",
+    "accelerate>=1.0.0",
+    "bitsandbytes>=0.44.0",
+    "trl>=1.0.0",
+    "datasets>=3.0.0",
+    "qwen-vl-utils",
+    "Pillow>=10.0.0",
+    "numpy>=1.26.0",
+    "opencv-python-headless>=4.8.0",
+    "tqdm",
+    "fire",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+eval = ["pycocoevalcap", "nltk"]
+vllm = ["vllm>=0.6.0"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"

@@ -1,0 +1,57 @@
+# ╔══════════════════════════════════════════════════════════╗
+# ║  SRDF-AF Default Configuration                         ║
+# ╠══════════════════════════════════════════════════════════╣
+# ║  Self-Refining Data Flywheel with AI Feedback           ║
+# ║  for VLN Instruction Generation                         ║
+# ╚══════════════════════════════════════════════════════════╝
+
+# === Paths (relative to project root) ===
+r2r_dir: ../Matterport3DSimulator/tasks/R2R/data
+connectivity_dir: ../Matterport3DSimulator/connectivity
+skybox_dir: ../RLAIF-NIG/data/mp3d/v1/scans
+image_dir: ./data/images
+output_dir: ./output
+
+# === Data ===
+split: train
+max_images: 12        # max viewpoint images per trajectory
+fov: 90               # perspective field of view (degrees)
+image_size: 480        # square output image size
+
+# === Models ===
+speaker: Qwen/Qwen3-VL-2B-Instruct
+judge_model: Qwen/Qwen3-VL-32B-Instruct
+speaker_api: ""       # set to API URL for generation (e.g. https://dashscope.aliyuncs.com/compatible-mode/v1)
+speaker_api_key: ""   # API key for speaker
+judge_api: ""          # set to vLLM/DashScope/SiliconFlow URL for API judge
+judge_api_key: ""      # API key for judge
+lora_r: 64
+lora_alpha: 128
+qlora: true
+
+# === Generation ===
+n_candidates: 8
+temp_low: 0.7
+temp_high: 1.2
+max_gen_tokens: 512
+
+# === Judge ===
+judge_temperature: 0.0
+score_gap: 0.15        # min score gap for preference pair validity
+
+# === Training ===
+sft_lr: 2.0e-4
+sft_epochs: 3
+dpo_lr: 5.0e-7
+dpo_beta: 0.1
+dpo_epochs: 1
+grpo_lr: 1.0e-6
+grpo_epochs: 1
+grpo_n_gen: 4
+batch_size: 2
+grad_accum: 8
+max_seq_len: 2048
+
+# === Flywheel ===
+n_rounds: 3
+optim: dpo             # "dpo" or "grpo"

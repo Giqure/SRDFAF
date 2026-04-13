@@ -1,0 +1,53 @@
+# SRDF-AF Configuration for RTX 4080 12GB
+# Conservative settings for local GPU training
+
+# === Paths ===
+r2r_dir: ../Matterport3DSimulator/tasks/R2R/data
+connectivity_dir: ../Matterport3DSimulator/connectivity
+skybox_dir: ../RLAIF-NIG/data/mp3d/v1/scans
+image_dir: ./data/images
+output_dir: ./output
+
+# === Data ===
+split: train
+max_images: 4          # reduced for 12GB VRAM (fewer visual tokens)
+fov: 90
+image_size: 480
+
+# === Models ===
+speaker: Qwen/Qwen2.5-VL-3B-Instruct    # local training (already cached)
+judge_model: qwen3-vl-32b-instruct       # API model name (DashScope)
+speaker_api: ""                           # empty = local speaker for training
+speaker_api_key: ""
+judge_api: https://dashscope.aliyuncs.com/compatible-mode/v1
+judge_api_key: ""                         # set DASHSCOPE_API_KEY env var or fill here
+lora_r: 32             # reduced for 12GB
+lora_alpha: 64
+qlora: true
+
+# === Generation ===
+n_candidates: 8
+temp_low: 0.7
+temp_high: 1.2
+max_gen_tokens: 512
+
+# === Judge ===
+judge_temperature: 0.0
+score_gap: 0.15
+
+# === Training ===
+sft_lr: 2.0e-4
+sft_epochs: 3
+dpo_lr: 5.0e-7
+dpo_beta: 0.1
+dpo_epochs: 1
+grpo_lr: 1.0e-6
+grpo_epochs: 1
+grpo_n_gen: 4
+batch_size: 1           # safe for 12GB
+grad_accum: 16
+max_seq_len: 4096       # must fit all image tokens + text
+
+# === Flywheel ===
+n_rounds: 3
+optim: dpo

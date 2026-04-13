@@ -2,11 +2,11 @@
 # Aggressive settings for maximum throughput
 
 # === Paths ===
-r2r_dir: ./data/R2R
-connectivity_dir: ./data/connectivity
-skybox_dir: ./data/mp3d/v1/scans
-image_dir: ./data/images
-output_dir: ./output
+r2r_dir: ~/autodl-fs/dataset/R2R
+connectivity_dir: ~/autodl-fs/dataset/connectivity
+skybox_dir: ~/autodl-fs/dataset/mp3d/v1/scans
+image_dir: ~/autodl-fs/dataset/images
+output_dir: ~/autodl-fs/output/srdf-af
 
 # === Data ===
 split: train

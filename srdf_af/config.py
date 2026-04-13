@@ -59,11 +59,23 @@ class Config:
     n_rounds: int = 3
     optim: str = "dpo"  # "dpo" or "grpo"
 
+    _PATH_FIELDS = {
+        "r2r_dir",
+        "connectivity_dir",
+        "skybox_dir",
+        "image_dir",
+        "output_dir",
+    }
+
     @classmethod
     def load(cls, path: str) -> "Config":
         with open(path) as f:
             d = yaml.safe_load(f) or {}
         valid = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}
+        for key in cls._PATH_FIELDS:
+            value = valid.get(key)
+            if isinstance(value, str):
+                valid[key] = str(Path(value).expanduser())
         return cls(**valid)
 
     def save(self, path: str):

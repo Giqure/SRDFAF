@@ -48,7 +48,7 @@ srdf_af/
 
 ## Configs
 - `configs/4080.yaml`: Conservative for 12GB VRAM laptop (batch=1, max_images=4)
-- `configs/pro6000.yaml`: Aggressive for 48GB server (batch=4, max_images=12, local judge)
+- `configs/pro6000.yaml`: Aggressive for 48GB server (batch=4, max_images=12, local judge), paths under `~/autodl-fs/dataset`
 - `configs/default.yaml`: Reference defaults
 
 ## CLI
@@ -65,6 +65,10 @@ qwen-vl-utils, Pillow, numpy, opencv-python-headless, tqdm, fire, pyyaml
 
 ## Environment Setup (Server)
 ```bash
+export HF_HOME=~/autodl-fs/.cache
+export HUGGINGFACE_HUB_CACHE=$HF_HOME/hub
+export HF_DATASETS_CACHE=$HF_HOME/datasets
+export TRANSFORMERS_CACHE=$HF_HOME/transformers
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
 pip install transformers accelerate peft bitsandbytes trl datasets
 pip install qwen-vl-utils Pillow numpy opencv-python-headless tqdm fire pyyaml

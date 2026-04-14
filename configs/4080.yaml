@@ -16,11 +16,11 @@ image_size: 480
 
 # === Models ===
 speaker: Qwen/Qwen2.5-VL-3B-Instruct    # local training (already cached)
-judge_model: qwen3-vl-32b-instruct       # API model name (DashScope)
+judge_model: qwen3.6-plus                # API model name (DashScope VLM)
 speaker_api: ""                           # empty = local speaker for training
 speaker_api_key: ""
 judge_api: https://dashscope.aliyuncs.com/compatible-mode/v1
-judge_api_key: ""                         # set DASHSCOPE_API_KEY env var or fill here
+judge_api_key: sk-fca3a207e99d407c89307be018b2b03d
 lora_r: 32             # reduced for 12GB
 lora_alpha: 64
 qlora: true
@@ -37,7 +37,7 @@ score_gap: 0.15
 
 # === Training ===
 sft_lr: 2.0e-4
-sft_epochs: 3
+sft_epochs: 1
 dpo_lr: 5.0e-7
 dpo_beta: 0.1
 dpo_epochs: 1

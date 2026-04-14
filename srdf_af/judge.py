@@ -14,6 +14,8 @@ import os
 import re
 from dataclasses import dataclass
 
+_THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+
 # ── Constitution ──────────────────────────────────────────────────────
 
 CONSTITUTION = {
@@ -113,7 +115,8 @@ class LocalJudge:
         messages = [{"role": "user", "content": content}]
 
         text = self.processor.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
+            messages, tokenize=False, add_generation_prompt=True,
+            enable_thinking=False,
         )
         images = [Image.open(p).convert("RGB") for p in image_paths]
         inputs = self.processor(
@@ -124,6 +127,7 @@ class LocalJudge:
         response = self.processor.batch_decode(
             ids[:, inputs["input_ids"].shape[1]:], skip_special_tokens=True
         )[0]
+        response = _THINK_RE.sub("", response)  # strip <think> blocks
         return parse_scores(response)
 
     def score_batch(
@@ -150,8 +154,8 @@ class APIJudge:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode("ascii")
 
-    def score(self, image_paths: list[str], instruction: str) -> Scores | None:
-        import requests
+    def score(self, image_paths: list[str], instruction: str, retries: int = 3) -> Scores | None:
+        import requests, time
 
         content: list[dict] = []
         for p in image_paths:
@@ -165,20 +169,31 @@ class APIJudge:
             "text": JUDGE_PROMPT.format(instruction=instruction),
         })
 
-        resp = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json={
-                "model": self.model,
-                "messages": [{"role": "user", "content": content}],
-                "max_tokens": 256,
-                "temperature": 0,
-            },
-            timeout=120,
-        )
-        resp.raise_for_status()
-        text = resp.json()["choices"][0]["message"]["content"]
-        return parse_scores(text)
+        for attempt in range(retries):
+            try:
+                resp = requests.post(
+                    f"{self.base_url}/chat/completions",
+                    headers={"Authorization": f"Bearer {self.api_key}"},
+                    json={
+                        "model": self.model,
+                        "messages": [{"role": "user", "content": content}],
+                        "max_tokens": 256,
+                        "temperature": 0,
+                        "extra_body": {"enable_thinking": False},
+                    },
+                    timeout=300,
+                )
+                resp.raise_for_status()
+                text = resp.json()["choices"][0]["message"]["content"]
+                return parse_scores(text)
+            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
+                if attempt < retries - 1:
+                    wait = 5 * (attempt + 1)
+                    print(f"  [retry {attempt+1}/{retries}] {e.__class__.__name__}, waiting {wait}s...")
+                    time.sleep(wait)
+                else:
+                    print(f"  [FAIL] {e.__class__.__name__} after {retries} attempts")
+                    return None
 
     def score_batch(
         self, items: list[tuple[list[str], str]]

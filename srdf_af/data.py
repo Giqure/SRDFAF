@@ -108,11 +108,11 @@ def resolve_images(
     return result
 
 
-# ── Qwen2.5-VL Message Formatting ────────────────────────────────────
+# ── VLM Message Formatting ────────────────────────────────────────
 
 
 def _user_content(image_paths: list[str]) -> list[dict]:
-    """Build multimodal user content list for Qwen2.5-VL."""
+    """Build multimodal user content list for VLM."""
     parts: list[dict] = [{"type": "image", "image": f"file://{p}"} for p in image_paths]
     parts.append({"type": "text", "text": USER_PROMPT})
     return parts

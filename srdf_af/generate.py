@@ -8,6 +8,7 @@ Supports two backends:
 import base64
 import json
 import random
+import re
 from pathlib import Path
 
 from PIL import Image
@@ -15,9 +16,11 @@ from tqdm import tqdm
 
 from srdf_af.data import SYSTEM_PROMPT, USER_PROMPT
 
+_THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+
 
 def _build_prompt(image_paths: list[str]) -> list[dict]:
-    """Build Qwen2.5-VL chat messages for instruction generation."""
+    """Build VLM chat messages for instruction generation."""
     content: list[dict] = [
         {"type": "image", "image": f"file://{p}"} for p in image_paths
     ]
@@ -45,7 +48,8 @@ def generate_candidates(
     messages = _build_prompt(image_paths)
     images = [Image.open(p).convert("RGB") for p in image_paths]
     text = processor.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+        messages, tokenize=False, add_generation_prompt=True,
+        enable_thinking=False,
     )
     inputs = processor(
         text=[text], images=images, return_tensors="pt", padding=True
@@ -64,6 +68,7 @@ def generate_candidates(
         out = processor.batch_decode(
             ids[:, inputs["input_ids"].shape[1] :], skip_special_tokens=True
         )[0]
+        out = _THINK_RE.sub("", out)  # strip <think> blocks if present
         candidates.append(out.strip())
     return candidates
 

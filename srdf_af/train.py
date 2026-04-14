@@ -1,4 +1,4 @@
-"""Unified SFT / DPO / GRPO training using TRL + LoRA/QLoRA on Qwen2.5-VL.
+"""Unified SFT / DPO / GRPO training using TRL + LoRA/QLoRA.
 
 All three stages share the same model-loading and LoRA configuration logic.
 Only the Trainer class, hyperparameters, and dataset format differ.
@@ -25,10 +25,10 @@ from srdf_af.config import Config
 def load_model_and_processor(
     model_name: str, qlora: bool = True
 ):
-    """Load Qwen2.5-VL with optional 4-bit QLoRA quantisation."""
+    """Load a VLM with optional 4-bit QLoRA quantisation."""
     kwargs: dict = {
         "trust_remote_code": True,
-        "dtype": torch.bfloat16,
+        "torch_dtype": torch.bfloat16,
     }
     if qlora:
         kwargs["quantization_config"] = BitsAndBytesConfig(
